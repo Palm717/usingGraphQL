@@ -15,6 +15,8 @@ const app = express();
 //database connection
 connectDB();
 
+app.use(cors());
+
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -25,7 +27,6 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
