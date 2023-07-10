@@ -91,13 +91,14 @@ const mutation = new GraphQLObjectType({
         name: { type: GraphQLNonNull(GraphQLString) },
         description: { type: GraphQLNonNull(GraphQLString) },
         status: { type: GraphQLNonNull(GraphQLString) },
-        clientId: { type: ClientType },
+        clientId: { type: GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         const project = new Project({
           name: args.name,
-          email: args.description,
-          phone: args.status,
+          description: args.description,
+          status: args.status,
+          clientId: args.clientId,
         });
 
         // mongoose save a client to our DB
