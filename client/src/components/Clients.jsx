@@ -1,16 +1,9 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { queries } from "../queries/clientQueries";
+
 import ClientRow from "./ClientRow";
 
-const GET_CLIENTS = gql`
-  query getClients {
-    clients {
-      id
-      name
-      email
-      phone
-    }
-  }
-`;
+const { GET_CLIENTS } = queries;
 
 export default function Clients() {
   const { loading, errors, data } = useQuery(GET_CLIENTS);
