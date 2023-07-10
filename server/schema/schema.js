@@ -9,6 +9,7 @@ import {
   GraphQLSchema,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLEnumType,
 } from "graphql";
 
 // Queries
@@ -48,7 +49,7 @@ const RootQuery = new GraphQLObjectType({
     projects: {
       type: new GraphQLList(ProjectType),
       resolve(parent, args) {
-        Project.find(); // return the projects array
+        return Project.find(); // return the projects array
       },
     },
 
@@ -84,27 +85,6 @@ const RootQuery = new GraphQLObjectType({
 const mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    addProject: {
-      type: ProjectType,
-      args: {
-        //non null -- make sure field is not left empty
-        name: { type: GraphQLNonNull(GraphQLString) },
-        description: { type: GraphQLNonNull(GraphQLString) },
-        status: { type: GraphQLNonNull(GraphQLString) },
-        clientId: { type: GraphQLNonNull(GraphQLID) },
-      },
-      resolve(parent, args) {
-        const project = new Project({
-          name: args.name,
-          description: args.description,
-          status: args.status,
-          clientId: args.clientId,
-        });
-
-        // mongoose save a client to our DB
-        return project.save();
-      },
-    },
     addClient: {
       type: ClientType,
       args: {
@@ -122,6 +102,44 @@ const mutation = new GraphQLObjectType({
 
         // mongoose save a client to our DB
         return client.save();
+      },
+    },
+    deleteClient: {
+      type: ClientType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        return Client.findByIdAndRemove(args.id);
+      },
+    },
+    addProject: {
+      type: ProjectType,
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLNonNull(GraphQLString) },
+        status: {
+          type: new GraphQLEnumType({
+            name: "ProjectStatus",
+            values: {
+              new: { value: "Not Started" },
+              progress: { value: "In Progress" },
+              completed: { value: "Completed" },
+            },
+          }),
+          defaultValue: "Not Started",
+        },
+        clientId: { type: GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        const project = new Project({
+          name: args.name,
+          description: args.description,
+          status: args.status,
+          clientId: args.clientId,
+        });
+
+        return project.save();
       },
     },
   },
