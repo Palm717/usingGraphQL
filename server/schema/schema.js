@@ -8,8 +8,10 @@ import {
   GraphQLString,
   GraphQLSchema,
   GraphQLList,
+  GraphQLNonNull,
 } from "graphql";
 
+// Queries
 const ProjectType = new GraphQLObjectType({
   name: "Project",
   fields: () => ({
@@ -78,6 +80,53 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 
+// Mutations
+const mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    addProject: {
+      type: ProjectType,
+      args: {
+        //non null -- make sure field is not left empty
+        name: { type: GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLNonNull(GraphQLString) },
+        status: { type: GraphQLNonNull(GraphQLString) },
+        clientId: { type: ClientType },
+      },
+      resolve(parent, args) {
+        const project = new Project({
+          name: args.name,
+          email: args.description,
+          phone: args.status,
+        });
+
+        // mongoose save a client to our DB
+        return project.save();
+      },
+    },
+    addClient: {
+      type: ClientType,
+      args: {
+        //non null -- make sure field is not left empty
+        name: { type: GraphQLNonNull(GraphQLString) },
+        email: { type: GraphQLNonNull(GraphQLString) },
+        phone: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        const client = new Client({
+          name: args.name,
+          email: args.email,
+          phone: args.phone,
+        });
+
+        // mongoose save a client to our DB
+        return client.save();
+      },
+    },
+  },
+});
+
 export default new GraphQLSchema({
   query: RootQuery,
+  mutation,
 });
