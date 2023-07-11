@@ -27,7 +27,7 @@ export default function Project() {
 
           <ClientInfo client={data.project.client} />
 
-          <DeleteProjectButton id={data.project.id} />
+          <DeleteProjectButton projectId={data.project.id} />
         </div>
       )}
     </>
